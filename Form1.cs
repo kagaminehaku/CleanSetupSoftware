@@ -64,6 +64,54 @@ namespace CleanSetupSoftware
                 MessageBox.Show("An error occurred during installation: " + ex.Message, "Installation Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                ProcessStartInfo processStartInfo = new ProcessStartInfo
+                {
+                    FileName = "powershell.exe",
+                    RedirectStandardInput = true,
+                    RedirectStandardOutput = true,
+                    UseShellExecute = false,
+                    CreateNoWindow = true
+                };
+
+                Process process = new Process
+                {
+                    StartInfo = processStartInfo
+                };
+                string a;
+                a = textBox1.Text;
+                process.Start();
+                process.StandardInput.WriteLine("winget search "+a);
+                process.StandardInput.WriteLine("Y");
+                process.StandardInput.Flush();
+                process.StandardInput.Close();
+                process.WaitForExit();
+                string output = process.StandardOutput.ReadToEnd();
+
+                process.WaitForExit();
+
+                // Split the output into individual lines
+                string[] lines = output.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
+
+                // Clear existing rows from the DataGridView
+                dataGridView1.Rows.Clear();
+
+                // Parse each line and add it as a row to the DataGridView
+                foreach (string line in lines)
+                {
+                    string[] values = line.Split('\t');
+                    dataGridView1.Rows.Add(values);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("An error occurred during installation: " + ex.Message, "Installation Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
     }
 }
 
